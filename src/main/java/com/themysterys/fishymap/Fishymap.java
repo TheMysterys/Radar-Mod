@@ -12,6 +12,8 @@ public class Fishymap implements ModInitializer {
     public boolean isNewInstallation = !Files.exists(FabricLoader.getInstance().getConfigDir().resolve("fishymap.json"));
     private final FishymapConfig config = FishymapConfig.load();
 
+    private static final String url = "http://localhost:5173";
+
     private static Fishymap instance;
 
     @Override
@@ -26,5 +28,9 @@ public class Fishymap implements ModInitializer {
 
     public static Fishymap getInstance() {
         return instance;
+    }
+
+    public static String getURL() {
+        return url;
     }
 }

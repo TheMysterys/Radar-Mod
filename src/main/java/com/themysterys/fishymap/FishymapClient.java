@@ -26,8 +26,6 @@ public class FishymapClient implements ClientModInitializer {
     private final String sharedSecret = AuthUtils.generateSharedSecret();
 
     private boolean isOnIsland = false;
-
-
     private boolean isFishing = false;
     private DisplayEntity.TextDisplayEntity currentFishingSpot = null;
 
@@ -146,7 +144,8 @@ public class FishymapClient implements ClientModInitializer {
     private void resetFishingSpot() {
         currentFishingSpot = null;
 
-        // TODO: Code that updates the map
+        // Post request to website
+        Utils.sendRequest("removespot", "");
 
 
     }
