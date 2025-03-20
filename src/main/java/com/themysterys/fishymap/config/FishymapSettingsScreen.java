@@ -29,7 +29,7 @@ public class FishymapSettingsScreen extends Screen {
                 .tooltip(value -> Tooltip.of(Text.translatable("fishymap.config.enabled.tooltip")))
                 .build(
                         Text.translatable("fishymap.config.enabled"), (button, value) -> {
-                            config.enabled = !value;
+                            config.enabled = value;
                             config.save();
                         }
                 ));
