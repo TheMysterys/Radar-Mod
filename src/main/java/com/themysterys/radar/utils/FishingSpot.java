@@ -1,6 +1,6 @@
-package com.themysterys.fishymap.utils;
+package com.themysterys.radar.utils;
 
-import com.themysterys.fishymap.Fishymap;
+import com.themysterys.radar.Radar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.decoration.DisplayEntity;
 
@@ -27,7 +27,7 @@ public class FishingSpot {
     public String format() {
         UUID uuid = MinecraftClient.getInstance().player.getUuid();
         String username = MinecraftClient.getInstance().player.getName().getString();
-        Boolean shareUser = Fishymap.getInstance().getConfig().shareUser;
+        Boolean shareUser = Radar.getInstance().getConfig().shareUser;
 
         StringBuilder json = new StringBuilder();
         json.append("{\n");

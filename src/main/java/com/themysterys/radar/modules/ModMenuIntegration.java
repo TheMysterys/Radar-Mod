@@ -1,12 +1,12 @@
-package com.themysterys.fishymap.modules;
+package com.themysterys.radar.modules;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import com.themysterys.fishymap.config.FishymapSettingsScreen;
+import com.themysterys.radar.config.RadarSettingsScreen;
 
 public class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return FishymapSettingsScreen::new;
+        return RadarSettingsScreen::new;
     }
 }

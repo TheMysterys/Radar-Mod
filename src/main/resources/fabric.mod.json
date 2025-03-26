@@ -1,27 +1,27 @@
 {
   "schemaVersion": 1,
-  "id": "fishymap",
+  "id": "radar",
   "version": "${version}",
-  "name": "FishyMap",
-  "description": "The mod that powers the FishyMap web map",
-  "authors": ["Some random nerds", "TheMysterys"],
+  "name": "Radar",
+  "description": "The mod helping crowdsource fishing spots on MCC Island",
+  "authors": ["TheMysterys"],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/fishymap/icon.png",
+  "icon": "assets/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.themysterys.fishymap.FishymapClient"
+      "com.themysterys.radar.RadarClient"
     ],
     "main": [
-      "com.themysterys.fishymap.Fishymap"
+      "com.themysterys.radar.Radar"
     ],
     "modmenu": [
-      "com.themysterys.fishymap.modules.ModMenuIntegration"
+      "com.themysterys.radar.modules.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "fishymap.mixins.json"
+    "radar.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",

@@ -1,4 +1,4 @@
-package com.themysterys.fishymap.utils;
+package com.themysterys.radar.utils;
 
 import java.security.SecureRandom;
 

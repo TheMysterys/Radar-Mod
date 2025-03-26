@@ -1,9 +1,9 @@
 {
-  "debug.fishymod.help": "F3 + F = Open FishyMap settings menu",
-  "fishymap.config.title": "FishyMap Options",
-  "fishymap.config.enabled": "Uploading",
-  "fishymap.config.enabled.tooltip": "Allows the mod to upload spots to the map",
-  "fishymap.config.shareUser": "Share Username",
-  "fishymap.config.shareUser.tooltip": "Shares your username on the web map"
+  "debug.radar.help": "F3 + F = Open Radar settings menu",
+  "radar.config.title": "Radar Options",
+  "radar.config.enabled": "Uploading",
+  "radar.config.enabled.tooltip": "Allows the mod to upload spots to the map",
+  "radar.config.shareUser": "Share Username",
+  "radar.config.shareUser.tooltip": "Shares your username on the web map"
 
 }

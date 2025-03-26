@@ -1,9 +1,9 @@
-package com.themysterys.fishymap.modules;
+package com.themysterys.radar.modules;
 
 import com.noxcrew.noxesium.network.NoxesiumPackets;
 import com.noxcrew.noxesium.network.clientbound.ClientboundMccServerPacket;
-import com.themysterys.fishymap.FishymapClient;
-import com.themysterys.fishymap.utils.Utils;
+import com.themysterys.radar.RadarClient;
+import com.themysterys.radar.utils.Utils;
 
 public class NoxesiumIntegration {
     public void init() {
@@ -16,14 +16,10 @@ public class NoxesiumIntegration {
 
     public void handlePacket(ClientboundMccServerPacket packet) {
         String subType = packet.subType();
-        Utils.log("Received MCC_SERVER packet with subtype: " + subType);
-
         if (Utils.isOnFishingIsland(subType)) {
-            Utils.log("On Fishing Island");
-            FishymapClient.getInstance().setIsland(subType);
+            RadarClient.getInstance().setIsland(subType);
         } else {
-            FishymapClient.getInstance().setIsland(null);
-            Utils.log("Not on Fishing Island");
+            RadarClient.getInstance().setIsland(null);
         }
     }
 }
