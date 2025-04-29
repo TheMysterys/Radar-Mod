@@ -7,7 +7,7 @@ plugins {
     id("maven-publish")
 }
 
-version = project.property("mod_version") as String
+version = (project.property("mod_version") as String + "+" + project.property("minecraft_version") as String)
 group = project.property("maven_group") as String
 
 base {
@@ -53,11 +53,11 @@ repositories {
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-    mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+    mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.14.1")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:${project.property("adventure_version")}")!!)
 
     modApi("com.terraformersmc:modmenu:12.0.0")
     modApi("com.noxcrew.noxesium:fabric:${project.property("noxesium_version")}")

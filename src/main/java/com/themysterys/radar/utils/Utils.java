@@ -2,19 +2,21 @@ package com.themysterys.radar.utils;
 
 import com.themysterys.radar.Radar;
 import com.themysterys.radar.RadarClient;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.fabric.FabricClientAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.*;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -26,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 public class Utils {
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private static final Logger logger = LoggerFactory.getLogger("Radar");
+    private static final List<Integer> allowedStatusCodes = List.of(200, 201, 400, 401);
 
     public static void log(String message) {
         logger.info("[Radar] {}", message);
@@ -36,7 +39,7 @@ public class Utils {
     }
 
     public static void sendMiniMessage(String message, boolean prefix, TagResolver replacements) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
         if (player == null) {
             return;
@@ -51,17 +54,20 @@ public class Utils {
         } else {
             parsed = miniMessage.deserialize(message);
         }
-        player.sendMessage(parsed);
+
+        final Audience client = FabricClientAudiences.of().audience();
+
+        client.sendMessage(parsed);
 
     }
 
     public static Boolean isOnIsland() {
-        ServerInfo serverInfo = MinecraftClient.getInstance().getCurrentServerEntry();
+        ServerData serverInfo = Minecraft.getInstance().getCurrentServer();
         if (serverInfo == null) {
             return false;
         }
 
-        return serverInfo.address.endsWith("mccisland.net") || serverInfo.address.endsWith("mccisland.com");
+        return serverInfo.ip.endsWith("mccisland.net") || serverInfo.ip.endsWith("mccisland.com");
     }
 
     public static Boolean isOnFishingIsland(String islandName) {
@@ -71,18 +77,18 @@ public class Utils {
     }
 
     public static void spawnPartials(MapStatus status, int count) {
-        if (MinecraftClient.getInstance().player == null) return;
-        FishingBobberEntity bobber = MinecraftClient.getInstance().player.fishHook;
+        if (Minecraft.getInstance().player == null) return;
+        FishingHook bobber = Minecraft.getInstance().player.fishing;
 
         if (bobber == null) return;
 
-        DustParticleEffect particleEffect;
+        DustParticleOptions particleEffect;
 
         switch (status) {
-            case SUCCESS -> particleEffect = new DustParticleEffect(new Vector3f(0,1,0), 1);
-            case EXISTS -> particleEffect = new DustParticleEffect(new Vector3f(0,0,1), 1);
-            case UNAUTHORISED -> particleEffect = new DustParticleEffect(new Vector3f(1,0.5f,0), 1);
-            case FAILED -> particleEffect = new DustParticleEffect(new Vector3f(1,0,0), 1);
+            case SUCCESS -> particleEffect = new DustParticleOptions(new Vector3f(0, 1, 0), 1);
+            case EXISTS -> particleEffect = new DustParticleOptions(new Vector3f(0, 0, 1), 1);
+            case UNAUTHORISED -> particleEffect = new DustParticleOptions(new Vector3f(1, 0.5f, 0), 1);
+            case FAILED -> particleEffect = new DustParticleOptions(new Vector3f(1, 0, 0), 1);
             case null, default -> {
                 return;
             }
@@ -91,20 +97,13 @@ public class Utils {
         for (int i = 0; i <= count; i++) {
             double randomX = (Math.random() - 0.5);
             double randomZ = (Math.random() - 0.5);
-            bobber.getWorld().addParticle(particleEffect,bobber.getX()+randomX,bobber.getY()+1,bobber.getZ()+randomZ,0.2,0,0.2);
+            bobber.level().addParticle(particleEffect, bobber.getX() + randomX, bobber.getY() + 1, bobber.getZ() + randomZ, 0.2, 0, 0.2);
         }
     }
 
-    private static final List<Integer> allowedStatusCodes = List.of(200,201,400,401);
-
     public static void sendRequest(String path, String data) {
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(Radar.getURL()+ "/" + path))
-                .header("Content-Type", "application/json")
-                .header("Authorization", RadarClient.getInstance().getSecret())
-                .POST(HttpRequest.BodyPublishers.ofString(data, StandardCharsets.UTF_8))
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(Radar.getURL() + "/" + path)).header("Content-Type", "application/json").header("Authorization", RadarClient.getInstance().getSecret()).POST(HttpRequest.BodyPublishers.ofString(data, StandardCharsets.UTF_8)).build();
 
         // Using sendAsync to avoid blocking the main thread
         CompletableFuture<HttpResponse<String>> futureResponse = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
@@ -121,10 +120,10 @@ public class Utils {
                 if (response.statusCode() == 201) {
                     spawnPartials(MapStatus.SUCCESS, 5);
                 } else if (response.statusCode() == 200) {
-                    spawnPartials(MapStatus.EXISTS,5);
+                    spawnPartials(MapStatus.EXISTS, 5);
                 } else if (response.statusCode() == 401) {
-                    spawnPartials(MapStatus.UNAUTHORISED,5);
-                }else {
+                    spawnPartials(MapStatus.UNAUTHORISED, 5);
+                } else {
                     spawnPartials(MapStatus.FAILED, 5);
                 }
             }
@@ -138,9 +137,6 @@ public class Utils {
     }
 
     public enum MapStatus {
-        SUCCESS,
-        EXISTS,
-        UNAUTHORISED,
-        FAILED,
+        SUCCESS, EXISTS, UNAUTHORISED, FAILED,
     }
 }

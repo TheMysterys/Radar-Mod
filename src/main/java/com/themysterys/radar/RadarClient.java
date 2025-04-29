@@ -12,14 +12,14 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.phys.AABB;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,13 +59,13 @@ public class RadarClient implements ClientModInitializer {
             isOnIsland = true;
             sharedSecret = AuthUtils.generateSharedSecret();
 
-            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            Player player = Minecraft.getInstance().player;
 
             if (player == null) {
                 throw new IllegalStateException("Player is null. How are you joining a server...");
             }
 
-            Utils.sendRequest("register", "{\"uuid\":\"" + player.getUuid() + "\"}");
+            Utils.sendRequest("register", "{\"uuid\":\"" + player.getUUID() + "\"}");
 
             if (Radar.getInstance().isNewInstallation) {
                 String[] message = new String[] {
@@ -95,7 +95,7 @@ public class RadarClient implements ClientModInitializer {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("radar").then(ClientCommandManager.literal("settings").executes(context -> {
-            MinecraftClient.getInstance().send(() -> MinecraftClient.getInstance().setScreen(new RadarSettingsScreen((null))));
+            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
             return 1;
         })).then(ClientCommandManager.literal("colors").executes(context -> {
             String[] message = new String[] {
@@ -108,7 +108,7 @@ public class RadarClient implements ClientModInitializer {
             Utils.sendMiniMessage(String.join("\n",message), true, null);
             return 1;
         })).then(ClientCommandManager.literal("map").executes(context -> {
-            MinecraftClient.getInstance().send(() -> Util.getOperatingSystem().open("https://radar.themysterys.com/"));
+            Minecraft.getInstance().tell(() -> Util.getPlatform().openUri("https://radar.themysterys.com/"));
             return 1;
         })).then(ClientCommandManager.literal("autorod").executes(context -> {
             if (!isOnIsland) return 1;
@@ -123,12 +123,12 @@ public class RadarClient implements ClientModInitializer {
     }
 
     private void checkFishing() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
         assert player != null;
 
 
-        FishingBobberEntity fishHook = player.fishHook;
+        FishingHook fishHook = player.fishing;
 
         if (fishHook == null) {
             if (isFishing) {
@@ -148,26 +148,26 @@ public class RadarClient implements ClientModInitializer {
             return;
         }
 
-        if (fishHook.isInFluid() && !isFishing) {
+        if (fishHook.isInLiquid() && !isFishing) {
             isFishing = true;
             waitTime = 0;
             getFishingSpot(player, fishHook);
         }
     }
 
-    private void getFishingSpot(ClientPlayerEntity player, FishingBobberEntity fishHook) {
+    private void getFishingSpot(Player player, FishingHook fishHook) {
 
-        BlockPos blockPos = fishHook.getBlockPos();
-        Box box = Box.of(blockPos.toCenterPos(), 3.5, 6.0, 3.5);
-        List<Entity> entities = player.getWorld().getOtherEntities(null, box).stream().filter(entity -> entity instanceof DisplayEntity.TextDisplayEntity).toList();
+        BlockPos blockPos = fishHook.getOnPos();
+        AABB box = AABB.ofSize(blockPos.getCenter(), 3.5, 6.0, 3.5);
+        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
 
         if (!entities.isEmpty()) {
-            DisplayEntity.TextDisplayEntity textDisplay = (DisplayEntity.TextDisplayEntity) entities.getFirst();
+            Display.TextDisplay textDisplay = (Display.TextDisplay) entities.getFirst();
             if (currentFishingSpot != null && currentFishingSpot.getEntity().equals(textDisplay)) {
                 return;
             }
 
-            String text = textDisplay.getText().asTruncatedString(Integer.MAX_VALUE);
+            String text = textDisplay.getText().getString(Integer.MAX_VALUE);
 
             int fishingSpotX = textDisplay.getBlockX();
             int fishingSpotZ = textDisplay.getBlockZ();

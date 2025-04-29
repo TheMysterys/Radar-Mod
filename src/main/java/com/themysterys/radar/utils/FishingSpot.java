@@ -1,8 +1,8 @@
 package com.themysterys.radar.utils;
 
 import com.themysterys.radar.Radar;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Display;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,22 +11,22 @@ public class FishingSpot {
     private final String cords;
     private final List<String> perks;
     private final String island;
-    private final DisplayEntity.TextDisplayEntity entity;
+    private final Display.TextDisplay entity;
 
-    public FishingSpot(String cords, List<String> perks, String island, DisplayEntity.TextDisplayEntity entity) {
+    public FishingSpot(String cords, List<String> perks, String island, Display.TextDisplay entity) {
         this.cords = cords;
         this.perks = perks;
         this.island = island;
         this.entity = entity;
     }
 
-    public DisplayEntity.TextDisplayEntity getEntity() {
+    public Display.TextDisplay getEntity() {
         return entity;
     }
 
     public String format() {
-        UUID uuid = MinecraftClient.getInstance().player.getUuid();
-        String username = MinecraftClient.getInstance().player.getName().getString();
+        UUID uuid = Minecraft.getInstance().player.getUUID();
+        String username = Minecraft.getInstance().player.getName().getString();
         Boolean shareUser = Radar.getInstance().getConfig().shareUser;
 
         StringBuilder json = new StringBuilder();
