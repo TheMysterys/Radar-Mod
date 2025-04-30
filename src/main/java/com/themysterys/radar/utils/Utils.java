@@ -3,16 +3,16 @@ package com.themysterys.radar.utils;
 import com.themysterys.radar.Radar;
 import com.themysterys.radar.RadarClient;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.fabric.FabricClientAudiences;
+import net.kyori.adventure.platform.modcommon.MinecraftClientAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +55,9 @@ public class Utils {
             parsed = miniMessage.deserialize(message);
         }
 
-        final Audience client = FabricClientAudiences.of().audience();
+        Audience client = MinecraftClientAudiences.of().audience();
 
         client.sendMessage(parsed);
-
     }
 
     public static Boolean isOnIsland() {
@@ -85,10 +84,10 @@ public class Utils {
         DustParticleOptions particleEffect;
 
         switch (status) {
-            case SUCCESS -> particleEffect = new DustParticleOptions(new Vector3f(0, 1, 0), 1);
-            case EXISTS -> particleEffect = new DustParticleOptions(new Vector3f(0, 0, 1), 1);
-            case UNAUTHORISED -> particleEffect = new DustParticleOptions(new Vector3f(1, 0.5f, 0), 1);
-            case FAILED -> particleEffect = new DustParticleOptions(new Vector3f(1, 0, 0), 1);
+            case SUCCESS -> particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
+            case EXISTS -> particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
+            case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
+            case FAILED -> particleEffect = new DustParticleOptions(ARGB.color(255, 0, 0), 1);
             case null, default -> {
                 return;
             }

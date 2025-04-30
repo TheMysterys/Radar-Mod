@@ -95,7 +95,7 @@ public class RadarClient implements ClientModInitializer {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("radar").then(ClientCommandManager.literal("settings").executes(context -> {
-            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
+            Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
             return 1;
         })).then(ClientCommandManager.literal("colors").executes(context -> {
             String[] message = new String[] {
@@ -108,7 +108,7 @@ public class RadarClient implements ClientModInitializer {
             Utils.sendMiniMessage(String.join("\n",message), true, null);
             return 1;
         })).then(ClientCommandManager.literal("map").executes(context -> {
-            Minecraft.getInstance().tell(() -> Util.getPlatform().openUri("https://radar.themysterys.com/"));
+            Minecraft.getInstance().schedule(() -> Util.getPlatform().openUri("https://radar.themysterys.com/"));
             return 1;
         })).then(ClientCommandManager.literal("autorod").executes(context -> {
             if (!isOnIsland) return 1;
