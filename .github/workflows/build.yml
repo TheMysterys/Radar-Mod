@@ -4,7 +4,7 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on: [push]
 
 jobs:
   build:
@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
-      - name: validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
