@@ -3,7 +3,9 @@ package com.themysterys.radar.utils;
 import com.themysterys.radar.Radar;
 import com.themysterys.radar.RadarClient;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.modcommon.MinecraftClientAudiences;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -84,7 +86,12 @@ public class Utils {
         DustParticleOptions particleEffect;
 
         switch (status) {
-            case SUCCESS -> particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
+            case SUCCESS -> {
+                particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
+                Audience client = MinecraftClientAudiences.of().audience();
+                Sound sound = Sound.sound(Key.key("entity.arrow.hit_player"), Sound.Source.MASTER,1,1);
+                client.playSound(sound);
+            }
             case EXISTS -> particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
             case FAILED -> particleEffect = new DustParticleOptions(ARGB.color(255, 0, 0), 1);
@@ -102,7 +109,12 @@ public class Utils {
 
     public static void sendRequest(String path, String data) {
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(Radar.getURL() + "/" + path)).header("Content-Type", "application/json").header("Authorization", RadarClient.getInstance().getSecret()).POST(HttpRequest.BodyPublishers.ofString(data, StandardCharsets.UTF_8)).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(Radar.getURL() + "/" + path))
+                .header("Content-Type", "application/json")
+                .header("Authorization", RadarClient.getInstance().getSecret())
+                .POST(HttpRequest.BodyPublishers.ofString(data, StandardCharsets.UTF_8))
+                .build();
 
         // Using sendAsync to avoid blocking the main thread
         CompletableFuture<HttpResponse<String>> futureResponse = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
@@ -111,6 +123,7 @@ public class Utils {
         futureResponse.thenAccept(response -> {
             // Handle the response (for example, logging or processing the body)
             if (!allowedStatusCodes.contains(response.statusCode())) {
+                Utils.log("Request: /"+ path);
                 Utils.log("Received status code: " + response.statusCode());
                 Utils.log("Response received:" + response.body());
             }
