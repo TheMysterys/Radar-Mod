@@ -74,6 +74,7 @@ tasks.processResources {
             "version" to project.version,
             "minecraft_version" to project.property("minecraft_version"),
             "loader_version" to project.property("loader_version"),
+            "fabric_version" to project.property("fabric_version"),
             "noxesium_version" to project.property("noxesium_version")
         )
     }
