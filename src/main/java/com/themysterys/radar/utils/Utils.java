@@ -94,11 +94,15 @@ public class Utils {
         switch (status) {
             case SUCCESS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
-                player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.MASTER, 1, 1);
+                if (Radar.getInstance().getConfig().playSound) {
+                    player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1);
+                }
             }
             case EXISTS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
-                player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.MASTER, 1, 0.5f);
+                if (Radar.getInstance().getConfig().playSound) {
+                    player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 0.5f);
+                }
             }
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
             case FAILED -> particleEffect = new DustParticleOptions(ARGB.color(255, 0, 0), 1);
