@@ -34,14 +34,22 @@ public class RadarSettingsScreen extends Screen {
         GridLayout gridWidget = new GridLayout();
         gridWidget.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
         GridLayout.RowHelper adder = gridWidget.createRowHelper(2);
+        // Mod Enabled
         adder.addChild(CycleButton.onOffBuilder(config.enabled).withTooltip(value -> Tooltip.create(Component.translatable("radar.config.enabled.tooltip"))).create(Component.translatable("radar.config.enabled"), (button, value) -> {
             config.enabled = value;
             config.save();
         }));
+        // Share Username
         adder.addChild(CycleButton.onOffBuilder(config.shareUser).withTooltip(value -> Tooltip.create(Component.translatable("radar.config.shareUser.tooltip"))).create(Component.translatable("radar.config.shareUser"), (button, value) -> {
             config.shareUser = value;
             config.save();
         }));
+        // Play Sound
+        adder.addChild(CycleButton.onOffBuilder(config.playSound).withTooltip(value -> Tooltip.create(Component.translatable("radar.config.playSound.tooltip"))).create(Component.translatable("radar.config.playSound"), (button, value) -> {
+            config.playSound = value;
+            config.save();
+        }));
+
 
         boolean isTheMysterys = Minecraft.getInstance().isLocalPlayer(UUID.fromString("4e832e0d-14b6-4f8f-ace2-280a9bf9dd98"));
 

@@ -15,6 +15,7 @@ public class RadarConfig {
 
     public boolean enabled = true;
     public boolean shareUser = false;
+    public boolean playSound = true;
 
     public static RadarConfig load() {
         var file = getConfigFile();

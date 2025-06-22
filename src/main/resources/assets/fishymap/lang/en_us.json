@@ -5,6 +5,8 @@
   "radar.config.enabled.tooltip": "Allows the mod to upload spots to the map",
   "radar.config.shareUser": "Share Username",
   "radar.config.shareUser.tooltip": "Shares your username on the web map",
+  "radar.config.playSound": "Play Sounds",
+  "radar.config.playSound.tooltip": "Allows the mod to play sounds when successfully adding a spot, or when a spot has already been added",
   "radar.config.devMode": "Use Dev Mode",
   "radar.config.devMode.tooltip": "Toggles the URL to localhost. Will require a rejoin if toggled on MCC Island to reauthenticate"
 
