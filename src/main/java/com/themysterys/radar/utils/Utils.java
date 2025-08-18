@@ -24,6 +24,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -95,13 +96,13 @@ public class Utils {
             case SUCCESS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1);
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1));
                 }
             }
             case EXISTS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 0.5f);
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 0.5f));
                 }
             }
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
@@ -110,10 +111,10 @@ public class Utils {
                 return;
             }
         }
-
+        SecureRandom random = new SecureRandom();
         for (int i = 0; i <= count; i++) {
-            double randomX = (Math.random() - 0.5);
-            double randomZ = (Math.random() - 0.5);
+            double randomX = (random.nextDouble() - 0.5);
+            double randomZ = (random.nextDouble() - 0.5);
             bobber.level().addParticle(particleEffect, bobber.getX() + randomX, bobber.getY() + 1, bobber.getZ() + randomZ, 0.2, 0, 0.2);
         }
     }
