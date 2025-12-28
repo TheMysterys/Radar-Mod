@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "2.1.0"
-    id("fabric-loom") version "1.10-SNAPSHOT"
+    id("fabric-loom") version "1.14-SNAPSHOT"
     id("maven-publish")
 }
 
@@ -59,7 +59,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 
     modApi("com.terraformersmc:modmenu:12.0.0")
-    modApi("com.noxcrew.noxesium:fabric:${project.property("noxesium_version")}")
 }
 
 tasks.processResources {
@@ -70,11 +69,12 @@ tasks.processResources {
 
     filesMatching("fabric.mod.json") {
         expand(
-            "version" to project.version,
-            "minecraft_version" to project.property("minecraft_version"),
-            "loader_version" to project.property("loader_version"),
-            "fabric_version" to project.property("fabric_version"),
-            "noxesium_version" to project.property("noxesium_version")
+            mapOf (
+                "version" to project.version,
+                "minecraft_version" to project.property("minecraft_version"),
+                "loader_version" to project.property("loader_version"),
+                "fabric_version" to project.property("fabric_version")
+            )
         )
     }
 }

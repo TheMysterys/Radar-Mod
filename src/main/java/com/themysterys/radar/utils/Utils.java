@@ -6,10 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -26,6 +23,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,8 +31,20 @@ public class Utils {
     private static final Logger logger = LoggerFactory.getLogger("Radar");
     private static final List<Integer> allowedStatusCodes = List.of(200, 201, 400, 401);
 
+    public static Map<String,String> islandList = Map.of(
+            "verdant_woods", "temperate_1",
+            "floral_forest", "temperate_2",
+            "dark_grove", "temperate_3",
+            "tropical_overgrowth", "tropical_1",
+            "coral_shores", "tropical_2",
+            "twisted_swamp", "tropical_3",
+            "ancient_sands", "barren_1",
+            "blazing_canyon", "barren_2",
+            "ashen_wastes", "barren_3"
+    );
+
     public static Style mccFont() {
-        return Style.EMPTY.withFont(ResourceLocation.fromNamespaceAndPath("mcc","icon"));
+        return Style.EMPTY.withFont(new FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("mcc","icon")));
     }
 
     private static MutableComponent getPrefix() {
@@ -78,9 +88,7 @@ public class Utils {
     }
 
     public static Boolean isOnFishingIsland(String islandName) {
-        List<String> islandList = List.of("temperate_1", "temperate_2", "temperate_3", "tropical_1", "tropical_2", "tropical_3", "barren_1", "barren_2", "barren_3");
-
-        return islandList.contains(islandName);
+        return islandList.containsKey(islandName);
     }
 
     public static void spawnPartials(MapStatus status, int count) {
@@ -88,7 +96,9 @@ public class Utils {
         LocalPlayer player = Minecraft.getInstance().player;
         FishingHook bobber = player.fishing;
 
-        if (bobber == null) return;
+        if (bobber == null) {
+            return;
+        }
 
         DustParticleOptions particleEffect;
 
@@ -115,11 +125,13 @@ public class Utils {
         for (int i = 0; i <= count; i++) {
             double randomX = (random.nextDouble() - 0.5);
             double randomZ = (random.nextDouble() - 0.5);
+
             bobber.level().addParticle(particleEffect, bobber.getX() + randomX, bobber.getY() + 1, bobber.getZ() + randomZ, 0.2, 0, 0.2);
         }
     }
 
     public static void sendRequest(String path, String data) {
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(Radar.getURL() + "/" + path))

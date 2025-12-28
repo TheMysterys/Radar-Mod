@@ -2,7 +2,6 @@ package com.themysterys.radar;
 
 import com.themysterys.radar.config.RadarSettingsScreen;
 import com.themysterys.radar.modules.AutoRod;
-import com.themysterys.radar.modules.NoxesiumIntegration;
 import com.themysterys.radar.utils.AuthUtils;
 import com.themysterys.radar.utils.FishingSpot;
 import com.themysterys.radar.utils.Utils;
@@ -47,7 +46,6 @@ public class RadarClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        new NoxesiumIntegration().init();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!Radar.getInstance().getConfig().enabled) return;
@@ -106,6 +104,7 @@ public class RadarClient implements ClientModInitializer {
             Utils.sendRequest("unregister", "");
         });
 
+
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("radar").then(ClientCommandManager.literal("settings").executes(context -> {
             Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
             return 1;
@@ -154,7 +153,6 @@ public class RadarClient implements ClientModInitializer {
 
         assert player != null;
 
-
         FishingHook fishHook = player.fishing;
 
         if (fishHook == null) {
@@ -183,7 +181,6 @@ public class RadarClient implements ClientModInitializer {
     }
 
     private void getFishingSpot(Player player, FishingHook fishHook) {
-
         BlockPos blockPos = fishHook.getOnPos();
         AABB box = AABB.ofSize(blockPos.getCenter(), 3.5, 6.0, 3.5);
         List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
@@ -200,8 +197,8 @@ public class RadarClient implements ClientModInitializer {
             int fishingSpotZ = textDisplay.getBlockZ();
 
             List<String> perks = Arrays.stream(text.split("\n")).filter(line -> line.contains("+")).map(line -> "+" + line.split("\\+")[1]).toList();
-            if (!perks.isEmpty()) {
 
+            if (!perks.isEmpty()) {
                 currentFishingSpot = new FishingSpot(fishingSpotX + "/" + fishingSpotZ, perks, currentIsland, textDisplay);
 
                 Utils.sendRequest("spots", currentFishingSpot.format());
@@ -222,8 +219,9 @@ public class RadarClient implements ClientModInitializer {
         if (island == null) {
             isFishing = false;
             resetFishingSpot();
+            return;
         }
-        currentIsland = island;
+        currentIsland = Utils.islandList.get(island);
     }
 
     public String getSecret() {

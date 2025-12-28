@@ -4,7 +4,8 @@
   "package": "com.themysterys.radar.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CustomDebugHotkeysMixin"
+    "CustomDebugHotkeysMixin",
+    "S2CPosMixin"
   ],
   "client": [
   ],
