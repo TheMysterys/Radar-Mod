@@ -181,6 +181,8 @@ public class RadarClient implements ClientModInitializer {
     }
 
     private void getFishingSpot(Player player, FishingHook fishHook) {
+        Utils.parseSidebar(null);
+
         BlockPos blockPos = fishHook.getOnPos();
         AABB box = AABB.ofSize(blockPos.getCenter(), 3.5, 6.0, 3.5);
         List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
@@ -219,9 +221,11 @@ public class RadarClient implements ClientModInitializer {
         if (island == null) {
             isFishing = false;
             resetFishingSpot();
-            return;
         }
-        currentIsland = Utils.islandList.get(island);
+        else {
+            island = Utils.islandList.get(island);
+        }
+        currentIsland = island;
     }
 
     public String getSecret() {
