@@ -8,6 +8,7 @@
   "radar.config.playSound": "Play Sounds",
   "radar.config.playSound.tooltip": "Allows the mod to play sounds when successfully adding a spot, or when a spot has already been added",
   "radar.config.devMode": "Use Dev Mode",
-  "radar.config.devMode.tooltip": "Toggles the URL to localhost. Will require a rejoin if toggled on MCC Island to reauthenticate"
-
+  "radar.config.devMode.tooltip": "Toggles the URL to localhost. Will require a rejoin if toggled on MCC Island to reauthenticate",
+  "sound.radar.fishing_spot_existing": "Fishing spot already logged",
+  "sound.radar.fishing_spot_new": "New fishing spot found"
 }

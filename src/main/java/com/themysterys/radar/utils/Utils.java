@@ -9,7 +9,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
@@ -139,13 +139,13 @@ public class Utils {
             case SUCCESS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1));
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_new")), SoundSource.PLAYERS, 1, 1));
                 }
             }
             case EXISTS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 0.5f));
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_existing")), SoundSource.PLAYERS, 1, 0.5f));
                 }
             }
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);

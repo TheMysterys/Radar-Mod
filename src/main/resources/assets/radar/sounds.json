@@ -1,0 +1,14 @@
+{
+  "fishing_spot_new": {
+    "subtitle": "sound.radar.fishing_spot_new",
+    "sounds": [
+      "radar:fishing_spot_new"
+    ]
+  },
+  "fishing_spot_existing": {
+    "subtitle": "sound.radar.fishing_spot_existing",
+    "sounds": [
+      "radar:fishing_spot_existing"
+    ]
+  }
+}
