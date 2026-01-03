@@ -145,7 +145,7 @@ public class Utils {
             case EXISTS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_existing")), SoundSource.PLAYERS, 1, 0.5f));
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_existing")), SoundSource.PLAYERS, 1, 1));
                 }
             }
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
