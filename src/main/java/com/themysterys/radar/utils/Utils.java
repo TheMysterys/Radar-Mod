@@ -6,16 +6,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.*;
+import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.scores.DisplaySlot;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,9 +35,17 @@ public class Utils {
     private static final Logger logger = LoggerFactory.getLogger("Radar");
     private static final List<Integer> allowedStatusCodes = List.of(200, 201, 400, 401);
 
-    public static Style mccFont() {
-        return Style.EMPTY.withFont(ResourceLocation.fromNamespaceAndPath("mcc","icon"));
-    }
+    public static Map<String,String> islandList = Map.of(
+            "verdant_woods", "temperate_1",
+            "floral_forest", "temperate_2",
+            "dark_grove", "temperate_3",
+            "tropical_overgrowth", "tropical_1",
+            "coral_shores", "tropical_2",
+            "twisted_swamp", "tropical_3",
+            "ancient_sands", "barren_1",
+            "blazing_canyon", "barren_2",
+            "ashen_wastes", "barren_3"
+    );
 
     private static MutableComponent getPrefix() {
         return Component.literal("[")
@@ -78,9 +88,36 @@ public class Utils {
     }
 
     public static Boolean isOnFishingIsland(String islandName) {
-        List<String> islandList = List.of("temperate_1", "temperate_2", "temperate_3", "tropical_1", "tropical_2", "tropical_3", "barren_1", "barren_2", "barren_3");
+        return islandList.containsKey(islandName);
+    }
 
-        return islandList.contains(islandName);
+    public static void parseSidebar(ClientboundSetDisplayObjectivePacket packet){
+        Minecraft client = Minecraft.getInstance();
+
+        if (client.player == null) return;
+        if (client.level == null) return;
+
+        String objectiveName;
+        Scoreboard scoreboard = client.level.getScoreboard();
+
+        if (packet != null) {
+            objectiveName = packet.getObjectiveName();
+        }
+        else {
+            objectiveName = Objects.requireNonNull(scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR)).getName();
+        }
+
+        Objective objective = scoreboard.getObjective(objectiveName);
+
+        if (objective == null) return;
+
+        String locationName = objective.getDisplayName().getString().toLowerCase().replace("mcci: ", "").replace(" ", "_");
+
+        if (Utils.isOnFishingIsland(locationName)) {
+            RadarClient.getInstance().setIsland(locationName);
+        } else {
+            RadarClient.getInstance().setIsland(null);
+        }
     }
 
     public static void spawnPartials(MapStatus status, int count) {
@@ -88,7 +125,9 @@ public class Utils {
         LocalPlayer player = Minecraft.getInstance().player;
         FishingHook bobber = player.fishing;
 
-        if (bobber == null) return;
+        if (bobber == null) {
+            return;
+        }
 
         DustParticleOptions particleEffect;
 
@@ -96,13 +135,13 @@ public class Utils {
             case SUCCESS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 255, 0), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1));
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_new")), SoundSource.PLAYERS, 1, 1));
                 }
             }
             case EXISTS -> {
                 particleEffect = new DustParticleOptions(ARGB.color(0, 0, 255), 1);
                 if (Radar.getInstance().getConfig().playSound) {
-                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 1, 0.5f));
+                    Minecraft.getInstance().schedule(() -> player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("radar", "fishing_spot_existing")), SoundSource.PLAYERS, 1, 1));
                 }
             }
             case UNAUTHORISED -> particleEffect = new DustParticleOptions(ARGB.colorFromFloat(1, 1, 0.5f, 0), 1);
@@ -115,11 +154,13 @@ public class Utils {
         for (int i = 0; i <= count; i++) {
             double randomX = (random.nextDouble() - 0.5);
             double randomZ = (random.nextDouble() - 0.5);
+
             bobber.level().addParticle(particleEffect, bobber.getX() + randomX, bobber.getY() + 1, bobber.getZ() + randomZ, 0.2, 0, 0.2);
         }
     }
 
     public static void sendRequest(String path, String data) {
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(Radar.getURL() + "/" + path))

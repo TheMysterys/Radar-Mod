@@ -5,6 +5,7 @@
   "name": "Radar",
   "description": "The mod helping crowdsource fishing spots on MCC Island",
   "authors": ["TheMysterys"],
+  "contributors": ["fingerguns83"],
   "custom": {
     "modmenu": {
       "links": {
@@ -33,7 +34,6 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": ">=${fabric_version}",
-    "minecraft": ">=${minecraft_version}",
-    "noxesium": ">=${noxesium_version}"
+    "minecraft": ">=${minecraft_version}"
   }
 }
