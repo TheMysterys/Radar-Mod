@@ -47,10 +47,6 @@ public class Utils {
             "ashen_wastes", "barren_3"
     );
 
-    public static Style mccFont() {
-        return Style.EMPTY.withFont(new FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("mcc","icon")));
-    }
-
     private static MutableComponent getPrefix() {
         return Component.literal("[")
                 .append(Component.literal("Radar").withColor(TextColor.parseColor("#006eff").getOrThrow().getValue()))
