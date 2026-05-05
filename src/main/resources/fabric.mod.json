@@ -18,6 +18,9 @@
   "icon": "assets/icon.png",
   "environment": "client",
   "entrypoints": {
+    "noxesium": [
+      "com.themysterys.radar.modules.NoxesiumIntegration"
+    ],
     "client": [
       "com.themysterys.radar.RadarClient"
     ],
@@ -34,7 +37,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${fabric_version}",
-    "minecraft": "=${minecraft_version}",
+    "minecraft": ">=${minecraft_version}",
     "noxesium": ">=${noxesium_version}"
   }
 }

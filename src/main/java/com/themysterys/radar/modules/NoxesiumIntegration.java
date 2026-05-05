@@ -1,5 +1,6 @@
 package com.themysterys.radar.modules;
 
+import com.noxcrew.noxesium.core.fabric.mcc.MccNoxesiumEntrypoint;
 import com.noxcrew.noxesium.core.mcc.MccPackets;
 import com.noxcrew.noxesium.core.mcc.ClientboundMccServerPacket;
 import com.themysterys.radar.RadarClient;
@@ -7,7 +8,12 @@ import com.themysterys.radar.utils.Utils;
 
 import java.util.List;
 
-public class NoxesiumIntegration {
+public class NoxesiumIntegration extends MccNoxesiumEntrypoint {
+    @Override
+    public void initialize() {
+        init();
+    }
+
     public void init() {
         Utils.log("Initializing NoxesiumIntegration");
 

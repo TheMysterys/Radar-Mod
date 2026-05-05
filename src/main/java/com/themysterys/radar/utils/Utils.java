@@ -69,7 +69,7 @@ public class Utils {
             component = message;
         }
 
-        player.displayClientMessage(component, false);
+        player.sendSystemMessage(component);
     }
 
     public static Boolean isOnIsland() {

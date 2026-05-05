@@ -7,7 +7,7 @@ import com.themysterys.radar.utils.AuthUtils;
 import com.themysterys.radar.utils.FishingSpot;
 import com.themysterys.radar.utils.Utils;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -50,7 +50,6 @@ public class RadarClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        new NoxesiumIntegration().init();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!Radar.getInstance().getConfig().enabled) return;
@@ -74,18 +73,18 @@ public class RadarClient implements ClientModInitializer {
             Utils.sendRequest("register", "{\"uuid\":\"" + player.getUUID() + "\"}");
 
             if (Radar.getInstance().isNewInstallation) {
-                MutableComponent[] components = new MutableComponent[] {
+                MutableComponent[] components = new MutableComponent[]{
                         Component.literal("Thank you for installing Radar."),
                         Component.literal("Sharing your username is ").append(Component.literal("disabled by default ").withColor(16777045)).append("and can be"),
                         Component.literal("changed in the configuration menu."),
-                        Component.literal("To access the configuration menu, run ").append(Component.literal("/radar settings").withStyle(ChatFormatting.BOLD,ChatFormatting.YELLOW).withStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/radar settings")))).append("."),
+                        Component.literal("To access the configuration menu, run ").append(Component.literal("/radar settings").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW).withStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/radar settings")))).append("."),
                         Component.literal("Happy Fishing")
                 };
                 MutableComponent result = null;
                 for (MutableComponent component : components) {
                     if (result == null) {
                         result = component;
-                    } else{
+                    } else {
                         result.append("\n").append(component);
                     }
                 }
@@ -110,11 +109,11 @@ public class RadarClient implements ClientModInitializer {
         });
 
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("radar").then(ClientCommandManager.literal("settings").executes(context -> {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("radar").then(ClientCommands.literal("settings").executes(context -> {
             Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
             return 1;
-        })).then(ClientCommandManager.literal("colors").executes(context -> {
-            MutableComponent[] components = new MutableComponent[] {
+        })).then(ClientCommands.literal("colors").executes(context -> {
+            MutableComponent[] components = new MutableComponent[]{
                     Component.literal("Radar particle colors:"),
                     Component.literal("Green").withStyle(ChatFormatting.GREEN).append(Component.literal(": Successfully added to map").withStyle(ChatFormatting.WHITE)),
                     Component.literal("Blue").withStyle(ChatFormatting.BLUE).append(Component.literal(": Spot already added to map").withStyle(ChatFormatting.WHITE)),
@@ -126,16 +125,16 @@ public class RadarClient implements ClientModInitializer {
             for (MutableComponent component : components) {
                 if (result == null) {
                     result = component;
-                } else{
+                } else {
                     result.append("\n").append(component);
                 }
             }
             Utils.sendMessage(result, true);
             return 1;
-        })).then(ClientCommandManager.literal("map").executes(context -> {
+        })).then(ClientCommands.literal("map").executes(context -> {
             Minecraft.getInstance().schedule(() -> Util.getPlatform().openUri("https://radar.themysterys.com/"));
             return 1;
-        })).then(ClientCommandManager.literal("autorod").executes(context -> {
+        })).then(ClientCommands.literal("autorod").executes(context -> {
             if (!isOnIsland) return 1;
             AutoRod.sendMessage();
             return 1;
