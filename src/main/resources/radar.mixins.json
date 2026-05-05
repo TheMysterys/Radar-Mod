@@ -3,11 +3,8 @@
   "minVersion": "0.8",
   "package": "com.themysterys.radar.mixins",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "S2CPosMixin"
-  ],
-  "client": [
-  ],
+  "mixins": [],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
