@@ -2,7 +2,6 @@ package com.themysterys.radar;
 
 import com.themysterys.radar.config.RadarSettingsScreen;
 import com.themysterys.radar.modules.AutoRod;
-import com.themysterys.radar.modules.NoxesiumIntegration;
 import com.themysterys.radar.utils.AuthUtils;
 import com.themysterys.radar.utils.FishingSpot;
 import com.themysterys.radar.utils.Utils;
@@ -50,7 +49,6 @@ public class RadarClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        new NoxesiumIntegration().init();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!Radar.getInstance().getConfig().enabled) return;
