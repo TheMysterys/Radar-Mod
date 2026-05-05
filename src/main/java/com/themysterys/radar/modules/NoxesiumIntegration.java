@@ -1,6 +1,5 @@
 package com.themysterys.radar.modules;
 
-import com.noxcrew.noxesium.core.fabric.mcc.MccNoxesiumEntrypoint;
 import com.noxcrew.noxesium.core.mcc.MccPackets;
 import com.noxcrew.noxesium.core.mcc.ClientboundMccServerPacket;
 import com.themysterys.radar.RadarClient;

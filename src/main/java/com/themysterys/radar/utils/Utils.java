@@ -173,7 +173,7 @@ public class Utils {
     public enum SpotStock {
         DEPLETED(0), LOW(1), MEDIUM(2), HIGH(3), VERY_HIGH(4), PLENTIFUL(5);
 
-        private int value;
+        private final int value;
 
         SpotStock(int i) {
             this.value = i;
