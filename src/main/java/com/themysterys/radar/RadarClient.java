@@ -25,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
 import java.util.List;
@@ -110,7 +111,7 @@ public class RadarClient implements ClientModInitializer {
 
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("radar").then(ClientCommands.literal("settings").executes(context -> {
-            Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
+            Minecraft.getInstance().schedule(() -> Minecraft.getInstance().gui.setScreen(new RadarSettingsScreen((null))));
             return 1;
         })).then(ClientCommands.literal("colors").executes(context -> {
             MutableComponent[] components = new MutableComponent[]{
@@ -188,7 +189,7 @@ public class RadarClient implements ClientModInitializer {
     private void getFishingSpot(Player player, FishingHook fishHook) {
 
         BlockPos blockPos = fishHook.getOnPos();
-        AABB box = AABB.ofSize(blockPos.getCenter(), 3.5, 6.0, 3.5);
+        AABB box = AABB.ofSize(Vec3.atCenterOf(blockPos), 3.5, 6.0, 3.5);
         List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
 
         if (!entities.isEmpty()) {
