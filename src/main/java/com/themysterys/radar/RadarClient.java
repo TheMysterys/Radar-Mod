@@ -188,7 +188,9 @@ public class RadarClient implements ClientModInitializer {
 
         BlockPos blockPos = fishHook.getOnPos();
         AABB box = AABB.ofSize(blockPos.getCenter(), 3.5, 6.0, 3.5);
-        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
+        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay && !entity.isPassenger()).toList();
+
+        Utils.debug("Entities Count: " + entities.size());
 
         if (!entities.isEmpty()) {
             Display.TextDisplay textDisplay = (Display.TextDisplay) entities.getFirst();
@@ -198,15 +200,25 @@ public class RadarClient implements ClientModInitializer {
 
             String text = textDisplay.getText().getString(Integer.MAX_VALUE);
 
+            Utils.debug("Display Text: " + text);
+
             int fishingSpotX = textDisplay.getBlockX();
             int fishingSpotZ = textDisplay.getBlockZ();
 
             List<String> perks = Arrays.stream(text.split("\n")).filter(line -> line.contains("+")).map(line -> "+" + line.split("\\+")[1]).toList();
-            Utils.SpotStock stock = Utils.SpotStock.valueOf(Arrays.stream(text.split("\n")).filter(line -> line.contains("Stock:")).toList().getFirst().split("Stock: ")[1].toUpperCase(Locale.ROOT).replaceAll(" ", "_"));
+            List<String> stockLine = Arrays.stream(text.split("\n")).filter(line -> line.contains("Stock:")).toList();
+
+            Utils.debug("Perks Perk: " + perks);
+            Utils.debug("Stock Line: " + stockLine);
+
+            if (stockLine.isEmpty()) {
+                Utils.spawnPartials(Utils.MapStatus.FAILED, 5);
+                return;
+            }
+
+            Utils.SpotStock stock = Utils.SpotStock.valueOf(stockLine.getFirst().split("Stock: ")[1].toUpperCase(Locale.ROOT).replaceAll(" ", "_"));
 
             if (stock.isLower(Utils.SpotStock.MEDIUM)) stock = Utils.SpotStock.MEDIUM;
-
-            Utils.log(stock.toString());
 
             if (!perks.isEmpty()) {
                 currentFishingSpot = new FishingSpot(fishingSpotX + "/" + fishingSpotZ, perks, stock, currentIsland, textDisplay);
@@ -230,6 +242,7 @@ public class RadarClient implements ClientModInitializer {
             isFishing = false;
             resetFishingSpot();
         }
+        Utils.debug("Island: " + island);
         currentIsland = island;
     }
 

@@ -49,6 +49,10 @@ public class RadarSettingsScreen extends Screen {
             config.playSound = value;
             config.save();
         }));
+        adder.addChild(CycleButton.onOffBuilder(config.debugLogs).withTooltip(value -> Tooltip.create(Component.translatable("radar.config.debugLogs.tooltip"))).create(Component.translatable("radar.config.debugLogs"), (button, value) -> {
+            config.debugLogs = value;
+            config.save();
+        }));
 
 
         boolean isTheMysterys = Minecraft.getInstance().isLocalPlayer(UUID.fromString("4e832e0d-14b6-4f8f-ace2-280a9bf9dd98"));
