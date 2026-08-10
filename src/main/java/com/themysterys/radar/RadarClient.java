@@ -189,7 +189,7 @@ public class RadarClient implements ClientModInitializer {
 
         BlockPos blockPos = fishHook.getOnPos();
         AABB box = AABB.ofSize(Vec3.atCenterOf(blockPos), 3.5, 6.0, 3.5);
-        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay /*&& !entity.isPassenger()*/).toList();
+        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay && !entity.isPassenger()).toList();
 
         Utils.debug("Entities Count: " + entities.size());
 
