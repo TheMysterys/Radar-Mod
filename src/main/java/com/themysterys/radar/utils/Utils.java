@@ -10,6 +10,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import org.slf4j.Logger;
@@ -20,7 +21,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -49,6 +49,11 @@ public class Utils {
 
     public static void log(String message) {
         logger.info("[Radar] {}", message);
+    }
+
+    public static void debug(String message) {
+        if (!Radar.getInstance().getConfig().debugLogs) return;
+        logger.info("[Radar Debug] {}", message);
     }
 
     public static void error(String message) {
@@ -121,7 +126,7 @@ public class Utils {
                 return;
             }
         }
-        SecureRandom random = new SecureRandom();
+        RandomSource random = RandomSource.createThreadLocalInstance();
         for (int i = 0; i <= count; i++) {
             double randomX = (random.nextDouble() - 0.5);
             double randomZ = (random.nextDouble() - 0.5);
@@ -151,6 +156,8 @@ public class Utils {
                 Utils.log("Received status code: " + response.statusCode());
                 Utils.log("Response received:" + response.body());
             }
+
+            Utils.debug("Status Code: " + response.statusCode());
 
             if (Objects.equals(path, "spots")) {
                 if (response.statusCode() == 201) {

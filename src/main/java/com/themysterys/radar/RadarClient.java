@@ -2,7 +2,6 @@ package com.themysterys.radar;
 
 import com.themysterys.radar.config.RadarSettingsScreen;
 import com.themysterys.radar.modules.AutoRod;
-import com.themysterys.radar.modules.NoxesiumIntegration;
 import com.themysterys.radar.utils.AuthUtils;
 import com.themysterys.radar.utils.FishingSpot;
 import com.themysterys.radar.utils.Utils;
@@ -52,7 +51,7 @@ public class RadarClient implements ClientModInitializer {
     public void onInitializeClient() {
         instance = this;
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientTickEvents.END_CLIENT_TICK.register(_ -> {
             if (!Radar.getInstance().getConfig().enabled) return;
             if (!Utils.isOnIsland()) return;
             if (currentIsland == null) return;
@@ -60,7 +59,7 @@ public class RadarClient implements ClientModInitializer {
             checkFishing();
         });
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+        ClientPlayConnectionEvents.JOIN.register((_, _, _) -> {
             if (!Utils.isOnIsland()) return;
             isOnIsland = true;
             sharedSecret = AuthUtils.generateSharedSecret();
@@ -96,7 +95,7 @@ public class RadarClient implements ClientModInitializer {
             }
         });
 
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
             if (!isOnIsland) return;
             isOnIsland = false;
             setIsland(null);
@@ -104,16 +103,16 @@ public class RadarClient implements ClientModInitializer {
             sharedSecret = null;
         });
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register(minecraftClient -> {
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
             if (sharedSecret == null) return;
             Utils.sendRequest("unregister", "");
         });
 
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommands.literal("radar").then(ClientCommands.literal("settings").executes(context -> {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(ClientCommands.literal("radar").then(ClientCommands.literal("settings").executes(_ -> {
             Minecraft.getInstance().schedule(() -> Minecraft.getInstance().gui.setScreen(new RadarSettingsScreen((null))));
             return 1;
-        })).then(ClientCommands.literal("colors").executes(context -> {
+        })).then(ClientCommands.literal("colors").executes(_ -> {
             MutableComponent[] components = new MutableComponent[]{
                     Component.literal("Radar particle colors:"),
                     Component.literal("Green").withStyle(ChatFormatting.GREEN).append(Component.literal(": Successfully added to map").withStyle(ChatFormatting.WHITE)),
@@ -132,14 +131,14 @@ public class RadarClient implements ClientModInitializer {
             }
             Utils.sendMessage(result, true);
             return 1;
-        })).then(ClientCommands.literal("map").executes(context -> {
+        })).then(ClientCommands.literal("map").executes(_ -> {
             Minecraft.getInstance().schedule(() -> Util.getPlatform().openUri("https://radar.themysterys.com/"));
             return 1;
-        })).then(ClientCommands.literal("autorod").executes(context -> {
+        })).then(ClientCommands.literal("autorod").executes(_ -> {
             if (!isOnIsland) return 1;
             AutoRod.sendMessage();
             return 1;
-        })).executes(context -> {
+        })).executes(_ -> {
             Utils.sendMessage(
                     Component.literal("Available commands: ")
                             .append(Component.literal("colors").withStyle(ChatFormatting.YELLOW))
@@ -190,7 +189,9 @@ public class RadarClient implements ClientModInitializer {
 
         BlockPos blockPos = fishHook.getOnPos();
         AABB box = AABB.ofSize(Vec3.atCenterOf(blockPos), 3.5, 6.0, 3.5);
-        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay).toList();
+        List<Entity> entities = player.level().getEntities(null, box).stream().filter(entity -> entity instanceof Display.TextDisplay /*&& !entity.isPassenger()*/).toList();
+
+        Utils.debug("Entities Count: " + entities.size());
 
         if (!entities.isEmpty()) {
             Display.TextDisplay textDisplay = (Display.TextDisplay) entities.getFirst();
@@ -200,15 +201,25 @@ public class RadarClient implements ClientModInitializer {
 
             String text = textDisplay.getText().getString(Integer.MAX_VALUE);
 
+            Utils.debug("Display Text: " + text);
+
             int fishingSpotX = textDisplay.getBlockX();
             int fishingSpotZ = textDisplay.getBlockZ();
 
             List<String> perks = Arrays.stream(text.split("\n")).filter(line -> line.contains("+")).map(line -> "+" + line.split("\\+")[1]).toList();
-            Utils.SpotStock stock = Utils.SpotStock.valueOf(Arrays.stream(text.split("\n")).filter(line -> line.contains("Stock:")).toList().getFirst().split("Stock: ")[1].toUpperCase(Locale.ROOT).replaceAll(" ", "_"));
+            List<String> stockLine = Arrays.stream(text.split("\n")).filter(line -> line.contains("Stock:")).toList();
+
+            Utils.debug("Perks Perk: " + perks);
+            Utils.debug("Stock Line: " + stockLine);
+
+            if (stockLine.isEmpty()) {
+                Utils.spawnPartials(Utils.MapStatus.FAILED, 5);
+                return;
+            }
+
+            Utils.SpotStock stock = Utils.SpotStock.valueOf(stockLine.getFirst().split("Stock: ")[1].toUpperCase(Locale.ROOT).replaceAll(" ", "_"));
 
             if (stock.isLower(Utils.SpotStock.MEDIUM)) stock = Utils.SpotStock.MEDIUM;
-
-            Utils.log(stock.toString());
 
             if (!perks.isEmpty()) {
                 currentFishingSpot = new FishingSpot(fishingSpotX + "/" + fishingSpotZ, perks, stock, currentIsland, textDisplay);
@@ -232,6 +243,7 @@ public class RadarClient implements ClientModInitializer {
             isFishing = false;
             resetFishingSpot();
         }
+        Utils.debug("Island: " + island);
         currentIsland = island;
     }
 
