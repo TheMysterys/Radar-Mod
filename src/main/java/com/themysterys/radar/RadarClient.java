@@ -110,7 +110,7 @@ public class RadarClient implements ClientModInitializer {
 
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> dispatcher.register(ClientCommands.literal("radar").then(ClientCommands.literal("settings").executes(_ -> {
-            Minecraft.getInstance().schedule(() -> Minecraft.getInstance().gui.setScreen(new RadarSettingsScreen((null))));
+            Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new RadarSettingsScreen((null))));
             return 1;
         })).then(ClientCommands.literal("colors").executes(_ -> {
             MutableComponent[] components = new MutableComponent[]{
